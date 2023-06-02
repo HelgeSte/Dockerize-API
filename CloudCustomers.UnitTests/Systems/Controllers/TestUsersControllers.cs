@@ -3,6 +3,7 @@ using CloudCustomers.API.Models;
 using CloudCustomers.API.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Moq;
 
 namespace CloudCustomers.UnitTests.Systems.Controllers;
@@ -16,7 +17,21 @@ public class UnitTest1
         var mockUsersService = new Mock<IUsersService>();
         mockUsersService
             .Setup(service => service.GetAllUsers())
-            .ReturnsAsync(new List<User>());
+            .ReturnsAsync(new List<User>()
+            {
+                new() // don't need to specify that it's a User
+                {
+                    Id = 1,
+                    Name = "Jane",
+                    Address = new Address
+                    {
+                        Street="123 Main St",
+                        City = "Madison",
+                        ZipCode = "53704"
+                    },
+                    Email = "jane@example.com"
+                }
+            });
 
         var sut = new UsersController(mockUsersService.Object); // Removes logger from controller, to make it simple at first
         // Act
@@ -44,6 +59,62 @@ public class UnitTest1
             Times.Once());
     }
 
+    [Fact]
+    public async Task Get_OnSuccess_ReturnsListOfUsers()
+    {
+        // Arrange
+        var mockUsersService = new Mock<IUsersService>();
+
+        mockUsersService
+            .Setup(service => service.GetAllUsers())
+            .ReturnsAsync(new List<User>()
+            {
+                new() // don't need to specify that it's a User
+                {
+                    Id = 1,
+                    Name = "Jane",
+                    Address = new Address
+                    {
+                        Street="123 Main St",
+                        City = "Madison",
+                        ZipCode = "53704"
+                    },
+                    Email = "jane@example.com"
+                }
+            });
+
+        var sut = new UsersController(mockUsersService.Object);
+        // Act
+        var result = await sut.Get();
+
+        // Assert
+        result.Should().BeOfType<OkObjectResult>();
+        var objectResult = (OkObjectResult)result;
+        objectResult.Value.Should().BeOfType<List<User>>(); // works with null
+        
+    }
+
+    [Fact]
+    public async Task Get_OnNoUsersFound_Returns404()
+    {
+        // Arrange
+        var mockUsersService = new Mock<IUsersService>();
+
+        mockUsersService
+            .Setup(service => service.GetAllUsers())
+            .ReturnsAsync(new List<User>());
+
+        var sut = new UsersController(mockUsersService.Object);
+
+        // Act
+        var result = await sut.Get();
+
+        // Assert 
+        result.Should().BeOfType<NotFoundResult>();
+        var objectResult = (NotFoundResult)result;
+        objectResult.StatusCode.Should().Be(404);
+
+    }
     /* // Parameterized unit tests:
     [Theory] // parameterized unit tests
     [InlineData("foo", 1)] // run multiple times, or as many times
