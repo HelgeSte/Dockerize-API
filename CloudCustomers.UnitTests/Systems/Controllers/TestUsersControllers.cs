@@ -40,7 +40,7 @@ public class UnitTest1
         var result = await sut.Get();
 
         // Assert
-        mockUserService.Verify(service => service.GetAllUsers(),
+        mockUserService.Verify(service => service.GetAllUsers(),// Use await for GetAllUsers in controller to make sure we run GetAllUsers method
             Times.Once());
     }
 

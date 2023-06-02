@@ -16,6 +16,8 @@ public class UsersController : ControllerBase
 
     [HttpGet(Name = "GetUsers")] // Inversion of control by using dependenbcy injection
     public async Task<IActionResult> Get(){
+        var users = await _usersService.GetAllUsers(); // this fixes the error in the second test (41:51++)
+        // when users has gotten all users, then the code contiues; first test failed because the code didn't call GetAllUsers().
         return Ok("All good"); // Status code gets our first unit test to pass (Get_OnSuccess_ReturnsStatusCode200)
     }
 
