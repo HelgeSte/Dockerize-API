@@ -1,6 +1,7 @@
 using CloudCustomers.API.Controllers;
 using CloudCustomers.API.Models;
 using CloudCustomers.API.Services;
+using CloudCustomers.UnitTests.Fixtures;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -17,21 +18,7 @@ public class UnitTest1
         var mockUsersService = new Mock<IUsersService>();
         mockUsersService
             .Setup(service => service.GetAllUsers())
-            .ReturnsAsync(new List<User>()
-            {
-                new() // don't need to specify that it's a User
-                {
-                    Id = 1,
-                    Name = "Jane",
-                    Address = new Address
-                    {
-                        Street="123 Main St",
-                        City = "Madison",
-                        ZipCode = "53704"
-                    },
-                    Email = "jane@example.com"
-                }
-            });
+            .ReturnsAsync(UsersFixture.GetTestUsers);
 
         var sut = new UsersController(mockUsersService.Object); // Removes logger from controller, to make it simple at first
         // Act
@@ -67,21 +54,7 @@ public class UnitTest1
 
         mockUsersService
             .Setup(service => service.GetAllUsers())
-            .ReturnsAsync(new List<User>()
-            {
-                new() // don't need to specify that it's a User
-                {
-                    Id = 1,
-                    Name = "Jane",
-                    Address = new Address
-                    {
-                        Street="123 Main St",
-                        City = "Madison",
-                        ZipCode = "53704"
-                    },
-                    Email = "jane@example.com"
-                }
-            });
+            .ReturnsAsync(UsersFixture.GetTestUsers);
 
         var sut = new UsersController(mockUsersService.Object);
         // Act
