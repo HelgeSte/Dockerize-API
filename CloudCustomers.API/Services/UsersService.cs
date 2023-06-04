@@ -1,11 +1,6 @@
 ﻿using CloudCustomers.API.Config;
 using CloudCustomers.API.Models;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CloudCustomers.API.Services
 {
@@ -23,16 +18,11 @@ namespace CloudCustomers.API.Services
             _apiConfig = apiConfig.Value;
         }
 
-        // Kanskje jeg fjerne denne kan
-        //public UsersService(HttpClient httpClient)
-        //{
-        //    _httpClient = httpClient;
-        //}
-
         public async Task<List<User>> GetAllUsers()
         {
             var usersResponse = await _httpClient
                 .GetAsync(_apiConfig.Endpoint);
+
             if(usersResponse.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 return new List<User>(); 
